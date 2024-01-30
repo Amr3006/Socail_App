@@ -16,7 +16,7 @@ Widget startingScreen() {
   if (uId == null) {
     return LoginScreen();
   }
-  return const HomeLayout();
+  
 }
 
 void main() async {
@@ -25,7 +25,7 @@ void main() async {
   await Firebase.initializeApp();
   await cacheHelper.init();
   runApp(const MyApp());
-}
+} 
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
