@@ -25,8 +25,7 @@ void main() async {
   await Firebase.initializeApp();
   await cacheHelper.init();
   runApp(const MyApp());
-  print("ff");
-} 
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
