@@ -16,7 +16,7 @@ Widget startingScreen() {
   if (uId == null) {
     return LoginScreen();
   }
-  
+  return const HomeLayout();
 }
 
 void main() async {
