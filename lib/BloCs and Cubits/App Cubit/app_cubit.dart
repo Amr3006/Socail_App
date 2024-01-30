@@ -44,11 +44,7 @@ class AppCubit extends Cubit<AppState> {
 
   final fireStore = FirebaseFirestore.instance;
   final fireStorage = FirebaseStorage.instance;
-
-   void hello() {
-    print("object");
-   }
-
+  
   void getUser() {
     fireStore.collection("Users").doc(uId).get().then((value) {
       model = UserModel.fromJson(value.data());
