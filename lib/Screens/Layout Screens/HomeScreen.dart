@@ -118,9 +118,10 @@ class HomeScreen extends StatelessWidget {
   Widget listBuilder(
           BuildContext context, postModel post, UserModel model, int index) =>
       Card(
-          elevation: 10,
+          elevation: 6,
           clipBehavior: Clip.antiAliasWithSaveLayer,
           margin: const EdgeInsets.all(6),
+          surfaceTintColor: Colors.white,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(

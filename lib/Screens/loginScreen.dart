@@ -49,85 +49,89 @@ class LoginScreen extends StatelessWidget {
                   padding: const EdgeInsets.all(20.0),
                   child: Form(
                     key: formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "LOGIN",
-                          style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
-                              fontSize: 60,
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),
-                        const SizedBox(height: 20,),
-                        reusableTextField(
-                            controller: emailController,
-                            inputType: TextInputType.emailAddress,
-                            hintText: "EMAIL",
-                            prefixIcon: Icons.person,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                            return "Please Enter Your Email";
-                            }
-                            return null;
-                            }
-                                  ),
-                        const SizedBox(height: 20,),
-                        reusableTextField(
-                            controller: passwordController,
-                            inputType: TextInputType.text,
-                            hintText: "PASSWORD",
-                            prefixIcon: Icons.lock,
-                            obscured: cubit.obscurity,
-                            suffixIcon: Icons.remove_red_eye,
-                            suffixFunction: () {
-                              cubit.changeObscurity();
-                            },
-                          validator: (value) {
-                              if (value!.isEmpty) {
-                                return "Please Enter Your Password";
-                              }
-                              return null;
-                          }
-                        ),
-                        const SizedBox(height: 30,),
-                        TextButton(
-                          child: Container(
-                            alignment: Alignment.center,
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.deepOrangeAccent.withOpacity(0.8),
-                            ),
-                            child: const Padding(
-                              padding: EdgeInsets.all(12.0),
-                              child: Text(
-                                  "LOGIN",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 30,
-                                  fontWeight: FontWeight.bold
-                                ),
-                              ),
-                            ),
-                          ),
-                          onPressed: (){
-                            if (formKey.currentState!.validate()) {
-                              cubit.Login(email: emailController.text, password: passwordController.text,context: context);
-                            }
-                          },
-                        ),
-                        Row(
+                    child: Center(
+                      child: SingleChildScrollView(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text("Need an account?",style: TextStyle(color: Colors.white),),
-                            TextButton(onPressed: (){
-                              navigateTo(context: context, destination: RegisterScreen());
-                            }, child: Text("Register Now!",style: TextStyle(color: Colors.orangeAccent[100]),))
+                            Text(
+                              "LOGIN",
+                              style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 60,
+                                  fontWeight: FontWeight.bold
+                              ),
+                            ),
+                            const SizedBox(height: 20,),
+                            reusableTextField(
+                                controller: emailController,
+                                inputType: TextInputType.emailAddress,
+                                hintText: "EMAIL",
+                                prefixIcon: Icons.person,
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                return "Please Enter Your Email";
+                                }
+                                return null;
+                                }
+                                      ),
+                            const SizedBox(height: 20,),
+                            reusableTextField(
+                                controller: passwordController,
+                                inputType: TextInputType.text,
+                                hintText: "PASSWORD",
+                                prefixIcon: Icons.lock,
+                                obscured: cubit.obscurity,
+                                suffixIcon: Icons.remove_red_eye,
+                                suffixFunction: () {
+                                  cubit.changeObscurity();
+                                },
+                              validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return "Please Enter Your Password";
+                                  }
+                                  return null;
+                              }
+                            ),
+                            const SizedBox(height: 30,),
+                            TextButton(
+                              child: Container(
+                                alignment: Alignment.center,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.deepOrangeAccent.withOpacity(0.8),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(12.0),
+                                  child: Text(
+                                      "LOGIN",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              onPressed: (){
+                                if (formKey.currentState!.validate()) {
+                                  cubit.Login(email: emailController.text, password: passwordController.text,context: context);
+                                }
+                              },
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Text("Need an account?",style: TextStyle(color: Colors.white),),
+                                TextButton(onPressed: (){
+                                  navigateTo(context: context, destination: RegisterScreen());
+                                }, child: Text("Register Now!",style: TextStyle(color: Colors.orangeAccent[100]),))
+                              ],
+                            )
                           ],
-                        )
-                      ],
+                        ),
+                      ),
                     ),
                   ),
                 ),

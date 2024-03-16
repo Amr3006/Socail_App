@@ -27,7 +27,8 @@ keyboardType: inputType,
 onChanged: onEdit,
 style: TextStyle(
     color: Colors.white.withOpacity(0.8),
-    fontWeight: FontWeight.bold
+    fontWeight: FontWeight.bold,
+    fontSize: 20
 ),
 decoration: InputDecoration(
   contentPadding: const EdgeInsets.symmetric(horizontal: 100,vertical: 20),
