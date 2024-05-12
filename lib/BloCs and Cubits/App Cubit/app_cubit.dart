@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_function_literals_in_foreach_calls, non_constant_identifier_names, unnecessary_import, prefer_const_constructors
 
-
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,61 +37,51 @@ class AppCubit extends Cubit<AppState> {
   var scaffoldKey = GlobalKey<ScaffoldState>();
   late String profilePictureUrl;
   late String coverPictureUrl;
-  String postPicUrl="";
+  String postPicUrl = "";
   late String email;
   var commentController = TextEditingController();
 
-
   final fireStore = FirebaseFirestore.instance;
   final fireStorage = FirebaseStorage.instance;
-  
+
   void getUser() {
     fireStore.collection("Users").doc(uId).get().then((value) {
       model = UserModel.fromJson(value.data());
-      profilePictureUrl=model!.profilePicture;
-      coverPictureUrl=model!.coverPicture;
-      email=model!.email;
+      profilePictureUrl = model!.profilePicture;
+      coverPictureUrl = model!.coverPicture;
+      email = model!.email;
       emit(successUserState());
     }).catchError((error) {
       emit(failedUserState(error.toString()));
     });
   }
 
-  List<postModel> posts =[];
-  List<String> postsId=[];
-  Map<String,List<LikeUserModel>> likes ={};
-  Map<String,List<CommentUserModel>> comments ={};
-
+  List<postModel> posts = [];
+  List<String> postsId = [];
+  Map<String, List<LikeUserModel>> likes = {};
+  Map<String, List<CommentUserModel>> comments = {};
 
   void getPosts() {
-    List<postModel> tempPosts =[];
-    List<String> TemppostsId=[];
-    tempPosts =[];
-    TemppostsId=[];
+    List<postModel> tempPosts = [];
+    List<String> TemppostsId = [];
+    tempPosts = [];
+    TemppostsId = [];
     emit(loadingPostsState());
-    fireStore
-    .collection("Posts")
-    .get()
-    .then((value) {
+    fireStore.collection("Posts").get().then((value) {
       emit(loadingPostsState());
-        value.docs.forEach((element5) async {
-          tempPosts.add(postModel.fromJson(element5.data()));
-          TemppostsId.add(element5.id);
-          Future.wait(
-            [
-              getLikes(element: element5),
-              getComments(element: element5)
-            ]
-          ).then((value) {
-            posts=tempPosts;
-            postsId=TemppostsId;
-          })
-          .whenComplete(() {
-            emit(successPostsState());
-          });
+      value.docs.forEach((element5) async {
+        tempPosts.add(postModel.fromJson(element5.data()));
+        TemppostsId.add(element5.id);
+        Future.wait(
+                [getLikes(element: element5), getComments(element: element5)])
+            .then((value) {
+          posts = tempPosts;
+          postsId = TemppostsId;
+        }).whenComplete(() {
+          emit(successPostsState());
+        });
       });
-    })
-    .catchError((error) {
+    }).catchError((error) {
       emit(failedPostsState(error.toString()));
     });
   }
@@ -103,60 +92,43 @@ class AppCubit extends Cubit<AppState> {
     const SettingsScreen(),
   ];
 
-
   Future<void> getLikes(
-    {required QueryDocumentSnapshot<Map<String, dynamic>> element}
-  ) async {
-          await element
-          .reference
-          .collection("Likes")
-          .get()
-          .then((value) {
-            List<LikeUserModel> tempLlist=[];
-            value.docs.forEach((element1) {
-            tempLlist.add(LikeUserModel.fromJson(element1.data()));
-          });
-          likes[element.id]=tempLlist;
-          });
+      {required QueryDocumentSnapshot<Map<String, dynamic>> element}) async {
+    await element.reference.collection("Likes").get().then((value) {
+      List<LikeUserModel> tempLlist = [];
+      value.docs.forEach((element1) {
+        tempLlist.add(LikeUserModel.fromJson(element1.data()));
+      });
+      likes[element.id] = tempLlist;
+    });
   }
 
-  Future<void> getComments({
-    required QueryDocumentSnapshot<Map<String, dynamic>> element
-  }) async {
-    await element
-          .reference
-          .collection("Comments")
-          .get()
-          .then((value) {
-            List<CommentUserModel> tempClist=[];
-            value.docs.forEach((element2) {
-              tempClist.add(CommentUserModel.fromJson(element2.data()));
-            });
-            comments[element.id]=tempClist;
-        });
+  Future<void> getComments(
+      {required QueryDocumentSnapshot<Map<String, dynamic>> element}) async {
+    await element.reference.collection("Comments").get().then((value) {
+      List<CommentUserModel> tempClist = [];
+      value.docs.forEach((element2) {
+        tempClist.add(CommentUserModel.fromJson(element2.data()));
+      });
+      comments[element.id] = tempClist;
+    });
   }
 
-
-  List<UserModel> chats=[];
+  List<UserModel> chats = [];
 
   void getChats() {
     emit(loadingGetChatsState());
-    List<UserModel> tempChats=[];
-    fireStore
-    .collection("Users")
-    .get()
-    .then((value) {
+    List<UserModel> tempChats = [];
+    fireStore.collection("Users").get().then((value) {
       value.docs.forEach((element) {
-        if (element.id!=uId){
+        if (element.id != uId) {
           tempChats.add(UserModel.fromJson(element.data()));
         }
       });
-    })
-    .whenComplete(() {
-      chats=tempChats;
+    }).whenComplete(() {
+      chats = tempChats;
       emit(successGetChatsState());
-    })
-    .catchError((error) {
+    }).catchError((error) {
       emit(failedGetChatsState());
     });
   }
@@ -165,151 +137,133 @@ class AppCubit extends Cubit<AppState> {
     required String reciever_uId,
     required String message,
   }) {
-      http.get(Uri.parse('http://worldtimeapi.org/api/ip'))
-      .then((value) {
-        var data = json.decode(value.body);
-        var dateTime = DateTime.parse(data['datetime']);
+    http.get(Uri.parse('http://worldtimeapi.org/api/ip')).then((value) {
+      var data = json.decode(value.body);
+      var dateTime = DateTime.parse(data['datetime']);
 
-        MessageModel model = MessageModel(
-      text: message, 
-      recieverUId: reciever_uId, 
-      senderUId: uId!, 
-      dateTime: dateTime.toString());
-    fireStore
-    .collection("Users")
-    .doc(uId)
-    .collection("Chats")
-    .doc(reciever_uId)
-    .collection("Messages")
-    .add(model.toJson())
-    .then((value) {
-      emit(successSendMessageState());
-    })
-    .catchError((error) {
-      emit(failedSendMessageState());
-    });
-    fireStore
-    .collection("Users")
-    .doc(reciever_uId)
-    .collection("Chats")
-    .doc(uId)
-    .collection("Messages")
-    .add(model.toJson())
-    .then((value) {
-      emit(successSendMessageState());
-    })
-    .catchError((error) {
-      emit(failedSendMessageState());
-    });
-
+      MessageModel model = MessageModel(
+          text: message,
+          recieverUId: reciever_uId,
+          senderUId: uId!,
+          dateTime: dateTime.toString());
+      fireStore
+          .collection("Users")
+          .doc(uId)
+          .collection("Chats")
+          .doc(reciever_uId)
+          .collection("Messages")
+          .add(model.toJson())
+          .then((value) {
+        emit(successSendMessageState());
+      }).catchError((error) {
+        emit(failedSendMessageState());
       });
+      fireStore
+          .collection("Users")
+          .doc(reciever_uId)
+          .collection("Chats")
+          .doc(uId)
+          .collection("Messages")
+          .add(model.toJson())
+          .then((value) {
+        emit(successSendMessageState());
+      }).catchError((error) {
+        emit(failedSendMessageState());
+      });
+    });
   }
 
   List<MessageModel> messages = [];
-  bool nomessages=false;
+  bool nomessages = false;
 
   void getMessages(String reciever_uId) {
     fireStore
-    .collection("Users")
-    .doc(uId)
-    .collection("Chats")
-    .doc(reciever_uId)
-    .collection("Messages")
-    .orderBy("dateTime")
-    .snapshots()
-    .listen((event) {
-      nomessages=false;
-      messages=[];
+        .collection("Users")
+        .doc(uId)
+        .collection("Chats")
+        .doc(reciever_uId)
+        .collection("Messages")
+        .orderBy("dateTime")
+        .snapshots()
+        .listen((event) {
+      nomessages = false;
+      messages = [];
       event.docs.forEach((element) {
         messages.add(MessageModel.fromJson(element.data()));
       });
-      nomessages=true;
+      nomessages = true;
       emit(successgetMessageState());
     });
   }
-
 
   void likePost({
     required String postId,
   }) {
     fireStore
-    .collection("Posts")
-    .doc(postId)
-    .collection("Likes")
-    .get()
-    .then((value) {
-      bool something=false;
-      for (var element in value.docs) { 
+        .collection("Posts")
+        .doc(postId)
+        .collection("Likes")
+        .get()
+        .then((value) {
+      bool something = false;
+      for (var element in value.docs) {
         if (element.id == uId) {
-          something=true;
+          something = true;
           break;
         }
       }
       if (!something) {
-      fireStore
-      .collection("Posts")
-      .doc(postId)
-      .collection("Likes")
-      .doc(uId)
-      .set({
-        "name" : model!.name,
-        "profilePic" : model!.profilePicture,
-      })
-      .then((value) {
-        getPosts();
-        emit(likePostState());
-      })
-      .catchError((error) {
-        emit(failedLikePostState());
-      });
+        fireStore
+            .collection("Posts")
+            .doc(postId)
+            .collection("Likes")
+            .doc(uId)
+            .set({
+          "name": model!.name,
+          "profilePic": model!.profilePicture,
+        }).then((value) {
+          getPosts();
+          emit(likePostState());
+        }).catchError((error) {
+          emit(failedLikePostState());
+        });
       } else {
         fireStore
-      .collection("Posts")
-      .doc(postId)
-      .collection("Likes")
-      .doc(uId)
-      .delete()
-      .then((value) {
-        getPosts();
-        emit(likePostState());
-        
-      })
-      .catchError((error) {
-        emit(failedLikePostState());
-      });
+            .collection("Posts")
+            .doc(postId)
+            .collection("Likes")
+            .doc(uId)
+            .delete()
+            .then((value) {
+          getPosts();
+          emit(likePostState());
+        }).catchError((error) {
+          emit(failedLikePostState());
+        });
       }
     });
   }
 
-  bool commentAdding=false;
+  bool commentAdding = false;
 
-  void addComment({ 
-    required String postId,
-    required BuildContext context
-  }) {
-    commentAdding=true;
-    fireStore
-    .collection("Posts")
-    .doc(postId)
-    .collection("Comments")
-    .add({
-      "name" : model!.name,
-      "profilePic" : model!.profilePicture,
-      "text":commentController.text
-    })
-    .then((value) {
+  void addComment({required String postId, required BuildContext context}) {
+    commentAdding = true;
+    fireStore.collection("Posts").doc(postId).collection("Comments").add({
+      "name": model!.name,
+      "profilePic": model!.profilePicture,
+      "text": commentController.text
+    }).then((value) {
       Navigator.pop(context);
-      commentAdding=false;
-      commentController.text='';
+      commentAdding = false;
+      commentController.text = '';
       emit(successUploadCommentState());
       getPosts();
-    })
-    .catchError((error) {
+    }).catchError((error) {
       emit(failedUploadCommentState());
     });
   }
 
-  int currentIndex=0; 
+  int currentIndex = 0;
 
   void changeBottomBarIndex(int i) {
     currentIndex = i;
@@ -327,26 +281,28 @@ class AppCubit extends Cubit<AppState> {
 
   File? profilePic;
 
-  bool update=true;
+  bool update = true;
 
   void changeProfilePicture() {
     picker.pickImage(source: ImageSource.gallery).then((value) {
-      profilePic=File(value!.path);
-      update=false;
+      profilePic = File(value!.path);
+      update = false;
       emit(loadingChangeProfilePictureState());
       fireStorage
-      .ref()
-      .child("Users/$uId/Profiles/${Uri.file(value.path).pathSegments.last}")
-      .putFile(profilePic!)
-      .then((value) {
-        update=true;
+          .ref()
+          .child(
+              "Users/$uId/Profiles/${Uri.file(value.path).pathSegments.last}")
+          .putFile(profilePic!)
+          .then((value) {
+        update = true;
         emit(changeProfilePictureState());
-        value.ref.getDownloadURL().then((value) {profilePictureUrl=value;});
-    })
-    .catchError((error) {
-      update=true;
-      error.toString();
-    });
+        value.ref.getDownloadURL().then((value) {
+          profilePictureUrl = value;
+        });
+      }).catchError((error) {
+        update = true;
+        error.toString();
+      });
     });
   }
 
@@ -354,20 +310,22 @@ class AppCubit extends Cubit<AppState> {
 
   void changeCoverPicture() async {
     picker.pickImage(source: ImageSource.gallery).then((value) {
-      coverPic=File(value!.path);
-      update=false;
+      coverPic = File(value!.path);
+      update = false;
       emit(loadingChangeCoverPictureState());
       fireStorage
-      .ref()
-      .child("Users/$uId/Cover/${Uri.file(value.path).pathSegments.last}")
-      .putFile(coverPic!)
-      .then((value) {
-        update=true;
-      emit(changeCoverPictureState());
-      value.ref.getDownloadURL().then((value) {coverPictureUrl=value;});
-    });
+          .ref()
+          .child("Users/$uId/Cover/${Uri.file(value.path).pathSegments.last}")
+          .putFile(coverPic!)
+          .then((value) {
+        update = true;
+        emit(changeCoverPictureState());
+        value.ref.getDownloadURL().then((value) {
+          coverPictureUrl = value;
+        });
+      });
     }).catchError((error) {
-      update=true;
+      update = true;
       emit(failedChangeCoverPictureState());
     });
   }
@@ -376,34 +334,29 @@ class AppCubit extends Cubit<AppState> {
 
   void choosePostImage() async {
     picker.pickImage(source: ImageSource.gallery).then((value) {
-      postPic=File(value!.path);
+      postPic = File(value!.path);
       emit(changePostPictureState());
     }).catchError((error) {
       emit(failedChangePostPictureState());
     });
   }
 
-  void uploadPostImage({
-    required String text,
-    required BuildContext context
-  }) {
+  void uploadPostImage({required String text, required BuildContext context}) {
     emit(loadingUploadPostPicState());
     fireStorage
-    .ref()
-    .child("Posts/$uId/${Uri.file(postPic!.path).pathSegments.last}")
-    .putFile(postPic!)
-    .then((value) {
+        .ref()
+        .child("Posts/$uId/${Uri.file(postPic!.path).pathSegments.last}")
+        .putFile(postPic!)
+        .then((value) {
       value.ref.getDownloadURL().then((value) {
-        postPicUrl=value;
-        uploadPost(text: text,context: context);
-        });
-    })
-    .catchError((error) {
-    });
+        postPicUrl = value;
+        uploadPost(text: text, context: context);
+      });
+    }).catchError((error) {});
   }
 
   void deletePostPic() {
-    postPic=null;
+    postPic = null;
     emit(postPicDeletedState());
   }
 
@@ -414,49 +367,47 @@ class AppCubit extends Cubit<AppState> {
     emit(loadingUploadPostState());
     var now = DateTime.now();
     var temp_post_model = postModel(
-      name: model!.name,
-      profilePic: model!.profilePicture,
-      text: text,
-      postPic: postPicUrl,
-      dateTime: now.toString()
-      ); 
-    fireStore
-    .collection("Posts")
-    .add(temp_post_model.toJson())
-    .then((value) {
+        name: model!.name,
+        profilePic: model!.profilePicture,
+        text: text,
+        postPic: postPicUrl,
+        dateTime: now.toString());
+    fireStore.collection("Posts").add(temp_post_model.toJson()).then((value) {
       emit(successUploadPostState());
       getPosts();
       navigateToAndErase(context: context, destination: const HomeLayout());
-    })
-    .catchError((error) {
+    }).catchError((error) {
       emit(failedUploadPostState());
     });
   }
 
-
-  void updateUser({
-    required String bio,
-    required String name,
-    required String phone,
-    required String email,
-    required String uId,
-    required BuildContext context
-  }) {
-    var temp_model = UserModel(name: name, email: email, phone: phone, uId: uId, bio: bio, coverPicture: coverPictureUrl, profilePicture: profilePictureUrl);
+  void updateUser(
+      {required String bio,
+      required String name,
+      required String phone,
+      required String email,
+      required String uId,
+      required BuildContext context}) {
+    var temp_model = UserModel(
+        name: name,
+        email: email,
+        phone: phone,
+        uId: uId,
+        bio: bio,
+        coverPicture: coverPictureUrl,
+        profilePicture: profilePictureUrl);
     emit(loadingUserState());
 
     fireStore
-    .collection("Users")
-    .doc(uId)
-    .update(temp_model.toJson())
-    .then((value) {
+        .collection("Users")
+        .doc(uId)
+        .update(temp_model.toJson())
+        .then((value) {
       navigateToAndErase(context: context, destination: HomeLayout());
-      model=null;
+      model = null;
       getUser();
-    })
-    .catchError((error) {
+    }).catchError((error) {
       emit(failedUpdateState());
     });
-  
   }
 }
